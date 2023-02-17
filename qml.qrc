@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>asset/shader/triangle_mirror.frag</file>
+        <file>asset/shader/triangle_mirror.vert</file>
+        <file>asset/image/cat.jpg</file>
+        <file>asset/image/cat.png</file>
     </qresource>
 </RCC>

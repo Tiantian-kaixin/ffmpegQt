@@ -2,18 +2,28 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Layouts 1.13
 import QtQuick.Controls 2.13
+import shaderGraph 1.0
 
-CWindows {
+Window {
     id: root
     visible: true
-    width: 2000
-    height: 2000
+    width: 600
+    height: 600
     title: qsTr("Hello World")
     property var models: false
 
-    Button {
-        text: "asda"
-        onClicked: {
+    FBOItem{
+        id: fboItem
+        anchors.fill: parent
+        fragment: ':/asset/shader/triangle_mirror.frag'
+        vertex: ':/asset/shader/triangle_mirror.vert'
+        json: {
+            "uniform" : {
+                "width": 0.4
+            },
+            "file" : {
+                "imgTexture" : ":/asset/image/cat.png"
+            }
         }
     }
 
