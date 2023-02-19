@@ -34,7 +34,6 @@ void FBORender::synchronize(QQuickFramebufferObject *item)
     m_json = fbo->json();
     m_callback = fbo->callbackFun();
     if (this->framebufferObject() != nullptr) {
-        qDebug() << "framebufferObject: " << this->framebufferObject()->texture();
         fbo->updateTexture(this->framebufferObject()->texture());
     }
 }
@@ -146,18 +145,23 @@ void FBORender::doRender() {
             for (it_child = uniformJson.begin(); it_child != uniformJson.end(); it_child++) {
                 QJsonValueRef value = it_child.value();
                 if (value.isString()) {
-                    QString filePath = value.toString();
-                    auto* qImage = new QImage(filePath);
-                    if (qImage->isNull()) {
-                        continue;
-                    }
                     // (一) glGenTexture
                     GLuint textureID = 0;
                     glGenTextures(1, &textureID);
                     glActiveTexture(GL_TEXTURE0);
                     glBindTexture(GL_TEXTURE_2D, textureID);
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, qImage->width(), qImage->height(), 0, GL_BGRA,
-                                 GL_UNSIGNED_BYTE, qImage->mirrored().bits());
+                    if (imageBit != nullptr) {
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageHeight, 0, GL_BGRA,
+                                     GL_UNSIGNED_BYTE, imageBit);
+                    } else {
+                        QString filePath = value.toString();
+                        auto* qImage = new QImage(filePath);
+                        if (qImage->isNull()) {
+                            continue;
+                        }
+                        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, qImage->width(), qImage->height(), 0, GL_BGRA,
+                        GL_UNSIGNED_BYTE, qImage->mirrored().bits());
+                    }
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                     // (二) QOpenGLTexture

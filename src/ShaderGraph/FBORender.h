@@ -26,6 +26,10 @@ public:
     QOpenGLFramebufferObject *createFramebufferObject(const QSize &size) override;
     void synchronize(QQuickFramebufferObject *item) override;
     void doRender();
+    Q_SLOT void renderNextFrame(uchar *bits, int width, int height);
+    uchar* imageBit;
+    int imageWidth;
+    int imageHeight;
 
 protected:
     void doInitialize();

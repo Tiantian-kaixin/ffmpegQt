@@ -22,7 +22,7 @@ Window {
                 "width": 0.4
             },
             "file" : {
-                "imgTexture" : ":/asset/image/cat.png"
+                "imgTexture" : ":/asset/video/testVideo.mov"
             }
         }
     }

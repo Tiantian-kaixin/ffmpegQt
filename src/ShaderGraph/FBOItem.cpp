@@ -6,6 +6,10 @@ FBOItem::FBOItem(QQuickItem *parent)
     //上下翻转，这样就和OpenGL的坐标系一致了
     setMirrorVertically(true);
     m_callfuct = std::bind(&FBOItem::updateTexture, this, std::placeholders::_1);
+    ffmpegThread = new FfmpegThread();
+    connect(ffmpegThread, &FfmpegThread::nextFrames, this, &FBOItem::renderNextFrame, Qt::QueuedConnection);
+    ffmpegThread->setPath("/Users/tiantian/Downloads/green.mov");
+    ffmpegThread->start();
 }
 
 QQuickFramebufferObject::Renderer *FBOItem::createRenderer() const
@@ -15,7 +19,8 @@ QQuickFramebufferObject::Renderer *FBOItem::createRenderer() const
             m_fragment,
             m_vertex
     };
-    return new FBORender(this->size().toSize(), shader);
+    render = new FBORender(this->size().toSize(), shader);
+    return render;
 }
 
 void FBOItem::setJson(QJsonObject json) {
@@ -30,4 +35,13 @@ int FBOItem::getTextureID() {
 void FBOItem::updateTexture(int textureID) {
     textureID = textureID;
     emit updateTextureID(textureID);
+}
+
+void FBOItem::renderNextFrame(uchar *bits, int width, int height) {
+    if (render != nullptr) {
+        render->imageBit = bits;
+        render->imageWidth = width;
+        render->imageHeight = height;
+        this->update();
+    }
 }
