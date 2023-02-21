@@ -15,6 +15,13 @@ void FfmpegThread::setPath(const QString &src) {
     audioPath = src;
 }
 
+int64_t FfmpegThread::getCurrentTime() {
+    auto now = std::chrono::system_clock::now();
+    auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+    auto value = now_ms.time_since_epoch();
+    return value.count();
+}
+
 void FfmpegThread::run() {
     AVFormatContext *pFormatCtx; // 存储音视频封装格式中包含的信息
     int videoIndex = -1; // 视频帧索引，初始化为-1
@@ -95,6 +102,7 @@ void FfmpegThread::run() {
     img_convert_ctx = sws_getContext(pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt,
                                      pCodecCtx->width, pCodecCtx->height, AV_PIX_FMT_RGB32, SWS_BICUBIC, nullptr, nullptr, nullptr);
     // av_read_frame读取一帧未解码的数据
+    int64_t start_time = getCurrentTime();
     while (av_read_frame(pFormatCtx, packet) >= 0)
     {
         // 如果是视频数据
@@ -111,9 +119,14 @@ void FfmpegThread::run() {
             {
                 sws_scale(img_convert_ctx, (const unsigned char* const*)pFrame->data, pFrame->linesize, 0, pCodecCtx->height,
                           pFrameRGB->data, pFrameRGB->linesize);
-//                QImage img((uchar*)pFrameRGB->data[0],pCodecCtx->width,pCodecCtx->height,QImage::Format_RGB32);
                 emit nextFrames((uchar*)pFrameRGB->data[0], pCodecCtx->width,pCodecCtx->height);
-                sleep(0.1);
+                AVRational time_base = pFormatCtx->streams[videoIndex]->time_base;
+                AVRational time_base_q = {1, AV_TIME_BASE};
+                int64_t pts_time = av_rescale_q(packet->dts, time_base, time_base_q);
+                int64_t now_time = (getCurrentTime() - start_time) * 1000;
+                if (pts_time > now_time) {
+                    QThread::usleep(pts_time - now_time);
+                }
             }
         }
         av_free_packet(packet);

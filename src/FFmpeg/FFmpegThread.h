@@ -32,6 +32,7 @@ protected:
 
 private:
     QString audioPath;
+    int64_t getCurrentTime();
 };
 
 

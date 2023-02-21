@@ -5,7 +5,7 @@ out vec4 cols;
 out vec2 uv;
 uniform vec4 color;
 void main() {
-    gl_Position = vec4(posVertex, 1.0f);
+    gl_Position = vec4(vec3(posVertex.x, - posVertex.y, posVertex.z), 1.0f);
     cols = color;
     uv = (1.0f + uvVertex.xy) / 2.0f;
 }
