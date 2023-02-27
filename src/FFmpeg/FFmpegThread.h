@@ -13,11 +13,15 @@ extern "C"{
 #include "libavdevice/avdevice.h"
 #include "libavformat/avio.h"
 #include "libavutil/imgutils.h"
+#include "libswresample/swresample.h"
 }
 #include <QString>
 #include <QDebug>
 #include <QImage>
 #include "QThread"
+#include <QAudioDeviceInfo>
+#include <QAudioFormat>
+#include <QAudioOutput>
 
 class FfmpegThread: public QThread {
 Q_OBJECT
@@ -31,8 +35,19 @@ protected:
     void run();
 
 private:
-    QString audioPath;
+    QString videoPath;
+    AVFormatContext *pFormatCtx;
+    int videoIndex = -1;
+    int audioIndex = -1;
+    void playAudio();
+    bool initAudio(int SampleRate);
+    std::shared_ptr<QAudioOutput> audio_;
     int64_t getCurrentTime();
+
+    void openVideo();
+    AVCodecContext* getCodecCtx(AVMediaType mediaType, int &avIndex);
+    void readFrame(AVCodecContext* pCodecCtx);
+    void phaseFrame(AVCodecContext* pCodecCtx);
 };
 
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(untitled LANGUAGES CXX)
+project(ffmpegQt LANGUAGES CXX)
 add_definitions(-DFFMPEG)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -85,7 +85,7 @@ endif()
 # Qt
 set(QT_ABSOLUTE_DIR /Users/tiantian/Qt5.13.0/5.13.0)
 set(CMAKE_PREFIX_PATH ${QT_ABSOLUTE_DIR}/clang_64/lib/cmake)
-find_package(Qt5 COMPONENTS Core Quick REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick Multimedia REQUIRED)
 # c++
 file(GLOB_RECURSE CORE_SOURCE_FILES
     src/*.cpp)
@@ -96,4 +96,4 @@ include_directories(${QT_ABSOLUTE_DIR}/clang_64/include ${ffmpegDir}/include ${s
 add_executable(${PROJECT_NAME} "main.cpp" "qml.qrc" ${CORE_SOURCE_FILES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Quick ${ffmpeg_libs_files})
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Quick Qt5::Multimedia ${ffmpeg_libs_files})
